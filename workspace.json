@@ -1,7 +1,109 @@
 {
   "version": 1,
-  "projects": {},
+  "projects": {
+    "engine": {
+      "root": "libs/engine",
+      "sourceRoot": "libs/engine/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": [
+              "libs/engine/tsconfig.lib.json",
+              "libs/engine/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/engine/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/engine/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "options": {
+            "outputPath": "dist/libs/engine",
+            "tsConfig": "libs/engine/tsconfig.lib.json",
+            "packageJson": "libs/engine/package.json",
+            "main": "libs/engine/src/index.ts",
+            "assets": ["libs/engine/*.md"]
+          }
+        }
+      }
+    },
+    "editor": {
+      "root": "apps/editor",
+      "sourceRoot": "apps/editor/src",
+      "projectType": "application",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/web:build",
+          "options": {
+            "outputPath": "dist/apps/editor",
+            "index": "apps/editor/src/index.html",
+            "main": "apps/editor/src/main.ts",
+            "polyfills": "apps/editor/src/polyfills.ts",
+            "tsConfig": "apps/editor/tsconfig.app.json",
+            "assets": ["apps/editor/src/favicon.ico", "apps/editor/src/assets"],
+            "styles": ["apps/editor/src/styles.scss"],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/editor/src/environments/environment.ts",
+                  "with": "apps/editor/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/web:dev-server",
+          "options": {
+            "buildTarget": "editor:build"
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "editor:build:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": ["apps/editor/tsconfig.app.json"],
+            "exclude": ["**/node_modules/**", "!apps/editor/**/*"]
+          }
+        }
+      }
+    }
+  },
   "cli": {
-    "defaultCollection": "@nrwl/workspace"
-  }
+    "defaultCollection": "@nrwl/web"
+  },
+  "defaultProject": "editor"
 }

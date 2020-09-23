@@ -21,5 +21,12 @@
       }
     }
   },
-  "projects": {}
+  "projects": {
+    "engine": {
+      "tags": []
+    },
+    "editor": {
+      "tags": []
+    }
+  }
 }

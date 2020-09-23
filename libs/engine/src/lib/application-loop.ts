@@ -1,3 +1,5 @@
+import { nextTick } from 'process';
+
 export interface Timestep {
   readonly step: number;
   readonly previousTime: number;
@@ -21,7 +23,9 @@ export class ApplicationLoop {
       throw new Error('Application is already running. Please close it first to run it again.')
     }
 
-    while(this.#running) {
+    this.#running = true;
+
+    tick(this, () => {
       const current = Date.now();
       if (this.#startTime === 0) {
         this.#startTime = Date.now();
@@ -34,14 +38,22 @@ export class ApplicationLoop {
         currentTime,
         step,
       };
-
       this.onUpdate(timestep);
 
       this.#time = currentTime;
-    }
+    });
   }
 
   stop() {
     this.#running = false;
   }
+}
+
+function tick(loop: ApplicationLoop, onTick: () => void): void {
+  requestAnimationFrame(() => {
+    if(loop.running) {
+      onTick();
+      tick(loop, onTick);
+    }
+  });
 }

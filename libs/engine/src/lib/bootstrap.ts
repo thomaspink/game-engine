@@ -1,9 +1,18 @@
 import { Application } from './application';
 import { ApplicationLoop } from './application-loop';
+import { assert } from './debug';
 
-export function bootstrap(App: typeof Application): void {
+export interface Constructor<T> {
+  new (...args: any[]): T;
+}
+
+export function bootstrap<T extends Application>(App: Constructor<T>): T {
+  assert(App !== Application && (App as any).__proto__ === Application,
+    `Invalid application class provided. Please create your own application ` +
+    `class that extends from the engine's abstract application class.`);
+
   const app = new App();
-  const loop = new ApplicationLoop((timestep) => app.onUpdate(timestep));
+  const loop = new ApplicationLoop((timestep) => app.__onUpdate(timestep));
 
   // Assign the loop to
   (app as any).__loop = loop;
@@ -11,6 +20,5 @@ export function bootstrap(App: typeof Application): void {
   // Starts and runs the app
   loop.start();
 
-  // If, at some point, the loop stops, close the app
-  app.close();
+  return app;
 }
